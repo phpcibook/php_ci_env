@@ -58,6 +58,34 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ci.vm.box = "opscode-ubuntu-14.04"
     ci.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
     ci.vm.network :private_network, ip: "192.168.33.100"
+
+    ci.vm.provision :chef_solo do |chef|
+      chef.log_level = "debug"
+      chef.cookbooks_path = "./cookbooks"
+      chef.json = {
+        nginx: {
+          docroot: {
+            path: "/var/lib/jenkins/jobs/blogapp/workspace/app/webroot",
+          },
+          default: { 
+            fastcgi_params: { CAKE_ENV: "development" }
+          },
+          test: {
+            available: true,
+            fastcgi_params: { CAKE_ENV: "ci" }
+          }
+        }
+      }
+      chef.run_list = %w[
+        recipe[apt]
+        recipe[phpenv::default]
+        recipe[phpenv::composer]
+        recipe[phpenv::develop]
+        recipe[capistrano]
+        recipe[jenkins::default]
+        recipe[jenkins::plugin]
+      ]
+    end
   end
 
   config.vm.define :deploy do |deploy|
