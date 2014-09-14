@@ -1,0 +1,14 @@
+DEPENDENCIES
+  apt
+  capistrano
+    path: site-cookbooks/capistrano
+  hostsfile
+  phpenv
+    path: site-cookbooks/phpenv
+
+GRAPH
+  apt (2.6.0)
+  capistrano (0.1.0)
+  hostsfile (2.4.5)
+  phpenv (0.1.0)
+    hostsfile (>= 0.0.0)
